@@ -11,7 +11,7 @@
   <section class="top-bar-section">
     <!-- Right Nav Section -->
     <ul class="right">
-      <li class="active"><a href="#">Github</a></li>
+      <li class="active"><a href="https://github.com/marlon407/AnimalsGame">Github</a></li>
       <li class="has-dropdown">
         <a href="#">Mais</a>
         <ul class="dropdown">
