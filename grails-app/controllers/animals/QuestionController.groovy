@@ -8,6 +8,7 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class QuestionController {
 
+    def gameService
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
@@ -47,10 +48,9 @@ class QuestionController {
         //if not, get the animal linked to that question
         if(nextQuestion.question == null || nextQuestion.question == ""){
             Animal animal = Animal.findByQuestion(nextQuestion)
-            nextQuestion = animal.question
-            nextQuestion.question = "é um(a) " + animal.name
+            nextQuestion.question = gameService.getNextQuestion(nextQuestion)
         }
-        //Return to the question asking the new one
+        //Return to ask a new question
         respond Question.list(params), model:[questionInstance: nextQuestion], view:'question'
     }
 
@@ -89,51 +89,18 @@ class QuestionController {
         Animal oldAnimal = Animal.get(params.oldAnimal)
         Question animalQuestion = oldAnimal.question
         Question parent = Question.get(params.parentQuestion)
+        Animal animal = Animal.get(params.animal)
         //set the parent to the new question
         questionInstance.parent = parent
         questionInstance.save flush:true
         //Decide to replace the right or the left child
         if(parent.rightChild == animalQuestion){
-            Question oldRight = parent.rightChild
-            //Replace parent's right child by the new question
-            parent.rightChild = questionInstance
-            parent.save flush:true
-            //Old right child gets new parent
-            oldRight.parent = questionInstance
-            oldRight.save flush:true
-            //new question's right child is set by oldRight
-            questionInstance.rightChild = oldRight
-            Question newLeft = new Question()
-            //Set a new left child to the new question
-            newLeft.parent = questionInstance
-            newLeft.save flush:true
-            questionInstance.leftChild = newLeft
-            questionInstance.save flush:true
-            //Link animal's question to the new question
-            Animal animal = Animal.get(params.animal)
-            animal.question = newLeft
-            animal.save flush:true
+            //Move the right side of the tree
+            gameService.addToRightSide(questionInstance,oldAnimal, animalQuestion, parent, animal)
         }
         else{
-            Question oldLeft = parent.leftChild
-            //Replace parent's left child by the new question
-            parent.leftChild = questionInstance
-            parent.save flush:true
-            //Old left child gets new parent
-            oldLeft.parent = questionInstance
-            oldLeft.save flush:true
-            //new question's right child is set by oldLeft
-            questionInstance.rightChild = oldLeft
-            Question newLeft = new Question()
-            //Set a new left child to the new question
-            newLeft.parent = questionInstance
-            newLeft.save flush:true
-            questionInstance.leftChild = newLeft
-            questionInstance.save flush:true
-            //Link animal's question to the new question
-            Animal animal = Animal.get(params.animal)
-            animal.question = newLeft
-            animal.save flush:true
+            //Move the left side of the tree
+            gameService.addToLeftSide(questionInstance,oldAnimal, animalQuestion, parent, animal)
         }
 
         request.withFormat {

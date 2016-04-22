@@ -1,10 +1,10 @@
 class BootStrap {
 
-	def animalService
+	def gameService
 
     def init = { servletContext ->
     	log.info("bootstrap")
-    	animalService.bootstrapApp()
+    	gameService.bootstrapApp()
     }
     def destroy = {
     }

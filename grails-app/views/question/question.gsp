@@ -8,7 +8,8 @@
 	</head>
 	<body>
 		<div class="text-center container">
-			<h3>O animal que você pensou ${questionInstance.question}?</h3>
+			<g:set var="question" value="${questionInstance.question}" />
+			<h3><g:message code="animal.whatDidYouThink" args="[question]" /></h3>
 			<a class="button" href="${createLink(controller:'question', action:'answer', params:['answer':true, question:questionInstance.id])}"/> Sim</a>
 			<a class="button" href="${createLink(controller:'question', action:'answer', params:['answer':false, question:questionInstance.id])}"/> Não</a>
 		</div>

@@ -6,7 +6,7 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class AnimalController {
 
-    def animalService
+    def gameService
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
@@ -52,7 +52,7 @@ class AnimalController {
     @Transactional
     def clearAll(){
         //Restore database to the initial state
-        animalService.cleanData()
+        gameService.cleanData()
     }
 
     def instructions(){}
